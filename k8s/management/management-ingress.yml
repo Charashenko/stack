@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: management
+  name: management-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: management.cluster.local
+      http:
+        paths:
+          - path: "/grafana"
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana-service
+                port:
+                  number: 80

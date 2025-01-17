@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: media
+  name: jellyfin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      media: jellyfin
+  template:
+    metadata:
+      name: jellyfin-pod
+      labels:
+        media: jellyfin
+    spec:
+      volumes:
+        - name: jellyfin-storage
+          persistentVolumeClaim:
+            claimName: media-persistent-volume-claim
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: data-media-persistent-volume-claim
+      containers:
+        - name: jellyfin
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "3000m"
+            limits:
+              memory: "6Gi"
+              cpu: "6000m"
+          image: jellyfin/jellyfin:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8096
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+            - name: JELLYFIN_PublishedServerUrl 
+              value: media.cluster.local
+          volumeMounts:
+            - name: jellyfin-storage
+              mountPath: /config
+              subPath: jellyfin
+            - name: data-storage
+              mountPath: /data/movies
+              subPath: movies
+            - name: data-storage
+              mountPath: /data/tvshows
+              subPath: tv

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jackett-deployment
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apps: jackett
+  template:
+    metadata:
+      name: jackett-pod
+      labels:
+        apps: jackett
+    spec:
+      containers:
+        - name: jackett
+          image: lscr.io/linuxserver/jackett:latest
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 9117
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+            - name: AUTO_UPDATE
+              value: "true"
+          volumeMounts:
+            - name: jackett-storage
+              mountPath: "/config"
+              subPath: "jackett"
+            - name: data-storage
+              mountPath: "/downloads"
+              subPath: "downloads"
+      volumes:
+        - name: jackett-storage
+          persistentVolumeClaim:
+            claimName: apps-persistent-volume-claim
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: data-apps-persistent-volume-claim

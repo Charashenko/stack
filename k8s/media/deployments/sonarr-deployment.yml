@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr-deployment
+  namespace: media
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      media: sonarr
+  template:
+    metadata:
+      name: sonarr-pod
+      labels:
+        media: sonarr
+    spec:
+      volumes:
+        - name: sonarr-storage
+          persistentVolumeClaim:
+            claimName: media-persistent-volume-claim
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: data-media-persistent-volume-claim
+      containers:
+        - name: sonarr
+          image: ghcr.io/linuxserver/sonarr:latest
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8989
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+          volumeMounts:
+            - name: sonarr-storage
+              mountPath: /config
+              subPath: sonarr
+            - name: data-storage
+              mountPath: /tv
+              subPath: tv
+            - name: data-storage
+              mountPath: /downloads
+              subPath: downloads

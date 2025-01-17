@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: media
+  name: jellyfin-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8096
+  selector:
+    media: jellyfin

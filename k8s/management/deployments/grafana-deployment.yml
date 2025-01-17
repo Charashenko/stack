@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana-deployment
+  namespace: management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      management: grafana
+  template:
+    metadata:
+      name: grafana-pod
+      labels:
+        management: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana-enterprise
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "512m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+          volumeMounts:
+            - name: grafana-storage
+              mountPath: "/var/lib/grafana"
+              subPath: "grafana/"
+      volumes:
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: management-persistent-volume-claim

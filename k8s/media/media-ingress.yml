@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: media
+  name: media-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: media.cluster.local
+      http:
+        paths:
+          - path: "/sonarr"
+            pathType: Prefix
+            backend:
+              service:
+                name: sonarr-service
+                port:
+                  number: 80
+          - path: "/radarr"
+            pathType: Prefix
+            backend:
+              service:
+                name: radarr-service
+                port:
+                  number: 80
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyseerr-service
+                port:
+                  number: 80
+          - path: "/jellyfin"
+            pathType: Prefix
+            backend:
+              service:
+                name: jellyfin-service
+                port:
+                  number: 80

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: media
+  name: radarr-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      media: radarr
+  template:
+    metadata:
+      name: radarr-pod
+      labels:
+        media: radarr
+    spec:
+      volumes:
+        - name: radarr-storage
+          persistentVolumeClaim:
+            claimName: media-persistent-volume-claim
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: data-media-persistent-volume-claim
+      containers:
+        - name: radarr
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          image: lscr.io/linuxserver/radarr:latest
+          ports:
+            - containerPort: 7878
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+          volumeMounts:
+            - name: radarr-storage
+              mountPath: /config
+              subPath: radarr
+            - name: data-storage
+              mountPath: /movies
+              subPath: movies
+            - name: data-storage
+              mountPath: /downloads
+              subPath: downloads

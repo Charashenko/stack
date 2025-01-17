@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission-deployment
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apps: transmission
+  template:
+    metadata:
+      name: transmission-pod
+      labels:
+        apps: transmission
+    spec:
+      containers:
+        - name: transmission
+          image: lscr.io/linuxserver/transmission:latest
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 9091
+          env:
+            - name: TRANSMISSION_WEB_UI
+              value: "flood-for-transmission"
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+            - name: OPENVPN_PROVIDER
+              value: "NORDVPN"
+            - name: OPENVPN_USERNAME
+              value: "HkJsPqukzX9GyUFTwPLbYmgR"
+            - name: OPENVPN_PASSWORD
+              value: "QAGNqm72uJDru8Ym6gZVXHLC"
+            - name: OPENVPN_CONFIG
+              value: "DE Berlin"
+            - name: TRANSMISSION_PEER_PORT
+              value: "47444"
+            - name: TRANSMISSION_DOWNLOAD_DIR
+              value: "/downloads"
+            - name: CREATE_TUN_DEVICE
+              value: "true"
+          volumeMounts:
+            - name: transmission-storage
+              mountPath: "/config"
+              subPath: "transmission/config"
+            - name: transmission-storage
+              mountPath: "/watch"
+              subPath: "transmission/watch"
+            - name: transmission-data-storage
+              mountPath: "/downloads"
+              subPath: "downloads"
+          # securityContext:
+          #   capabilities:
+          #     add:
+          #       - NET_ADMIN
+      volumes:
+        # - name: dev-tun
+        #   hostPath:
+        #     path: "/dev/net/tun"
+        - name: transmission-storage
+          persistentVolumeClaim:
+            claimName: apps-persistent-volume-claim
+        - name: transmission-data-storage
+          persistentVolumeClaim:
+            claimName: data-apps-persistent-volume-claim

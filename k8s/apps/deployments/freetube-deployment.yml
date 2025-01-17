@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: freetube-deployment
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apps: freetube
+  template:
+    metadata:
+      name: freetube-pod
+      labels:
+        apps: freetube
+    spec:
+      containers:
+        - name: freetube
+          image: lscr.io/linuxserver/freetube:latest
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "2000m"
+            limits:
+              memory: "4Gi"
+              cpu: "3000m"
+          ports:
+            - containerPort: 3000
+          env:
+            - name: SUBFOLDER
+              value: "/freetube/"
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+            - name: NO_DECOR
+              value: "True"
+            - name: DRINODE
+              value: "/dev/dri/renderD128"
+          volumeMounts:
+            - name: shmem
+              mountPath: "/dev/shm"
+            - name: freetube-storage
+              mountPath: "/config"
+              subPath: "freetube/config"
+          securityContext:
+            seccompProfile:
+              type: Unconfined
+      volumes:
+        - name: shmem
+          emptyDir:
+            medium: Memory
+            sizeLimit: 5Gi
+        - name: freetube-storage
+          persistentVolumeClaim:
+            claimName: apps-persistent-volume-claim

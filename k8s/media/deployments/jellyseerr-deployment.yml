@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: media
+  name: jellyseerr-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      media: jellyseerr
+  template:
+    metadata:
+      name: jellyseerr-pod
+      labels:
+        media: jellyseerr
+    spec:
+      volumes:
+        - name: jellyseerr-storage
+          persistentVolumeClaim:
+            claimName: media-persistent-volume-claim
+      containers:
+        - name: jellyseerr
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          image: fallenbagel/jellyseerr:latest
+          ports:
+            - containerPort: 5055
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/Berlin"
+          volumeMounts:
+            - name: jellyseerr-storage
+              mountPath: /app/config
+              subPath: jellyseerr

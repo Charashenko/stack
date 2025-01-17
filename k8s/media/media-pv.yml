@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-persistent-volume
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/media"
+  claimRef:
+    namespace: media
+    name: media-persistent-volume-claim
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-media-persistent-volume
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+  claimRef:
+    namespace: media
+    name: data-media-persistent-volume-claim

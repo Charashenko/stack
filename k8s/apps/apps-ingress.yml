@@ -1,0 +1,52 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: apps
+  name: apps-ingress
+  # annotations:
+  #   nginx.ingress.kubernetes.io/use-regex: "true"
+  #   nginx.ingress.kubernetes.io/rewrite-target: /$1$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: apps.cluster.local
+      http:
+        paths:
+          - path: "/httpd"
+            pathType: Prefix
+            backend:
+              service:
+                name: httpd-service
+                port:
+                  number: 80
+          - path: "/freetube"
+            pathType: Prefix
+            backend:
+              service:
+                name: freetube-service
+                port:
+                  number: 80
+          - path: "/jackett"
+            pathType: Prefix
+            backend:
+              service:
+                name: jackett-service
+                port:
+                  number: 80
+          - path: "/transmission"
+            pathType: Prefix
+            backend:
+              service:
+                name: transmission-service
+                port:
+                  number: 80
+    - host: cluster.local
+      http:
+        paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: homarr-service
+                port:
+                  number: 80

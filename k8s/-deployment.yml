@@ -1,0 +1,21 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: dashy-deployment
+#   namespace: apps
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       apps: app-dashboard
+#   template:
+#     metadata:
+#       name: dashy-pod
+#       labels:
+#         apps: app-dashboard
+#     spec:
+#       containers:
+#         - name: dashy
+#           image: lissy93/dashy
+#           ports:
+#             - containerPort: 8080
